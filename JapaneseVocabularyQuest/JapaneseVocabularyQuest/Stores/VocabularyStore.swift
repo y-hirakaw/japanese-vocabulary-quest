@@ -3,7 +3,7 @@ import Combine
 import SwiftData
 
 @MainActor
-protocol VocabularyStoreProtocol: ObservableObject {
+protocol VocabularyStoreProtocol: AnyObject {
     var vocabulariesPublisher: Published<[Vocabulary]>.Publisher { get }
     var errorPublisher: Published<Error?>.Publisher { get }
     var isLoadingPublisher: Published<Bool>.Publisher { get }
@@ -15,26 +15,22 @@ protocol VocabularyStoreProtocol: ObservableObject {
 
 @MainActor
 final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
-    nonisolated static let shared = VocabularyStore(useMockRepository: true)
+    static let shared = VocabularyStore()
     
-    @Published var vocabularies: [Vocabulary] = []
-    @Published var error: Error?
-    @Published var isLoading: Bool = false
+    @Published private(set) var vocabularies: [Vocabulary] = []
+    @Published private(set) var error: Error?
+    @Published private(set) var isLoading: Bool = false
     
     var vocabulariesPublisher: Published<[Vocabulary]>.Publisher { $vocabularies }
     var errorPublisher: Published<Error?>.Publisher { $error }
     var isLoadingPublisher: Published<Bool>.Publisher { $isLoading }
     
-    nonisolated private let repository: VocabularyRepositoryProtocol?
+    private let repository: VocabularyRepositoryProtocol?
     
-    /// Store初期化（nonisolated）
+    /// Store初期化
     /// useMockRepositoryの場合はnil設定（テスト・デモ用）
-    nonisolated init(repository: VocabularyRepositoryProtocol? = nil, modelContext: ModelContext? = nil, useMockRepository: Bool = false) {
-        if useMockRepository {
-            self.repository = nil
-        } else {
-            self.repository = repository
-        }
+    private init(repository: VocabularyRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+        self.repository = useMockRepository ? nil : repository
     }
     
     func fetchVocabularies(for scene: LearningScene) async {

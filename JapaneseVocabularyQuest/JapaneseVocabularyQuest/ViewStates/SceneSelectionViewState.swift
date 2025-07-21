@@ -13,10 +13,10 @@ final class SceneSelectionViewState {
     private let userStore: any UserStoreProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init(sceneStore: any SceneStoreProtocol = SceneStore.shared,
-         userStore: any UserStoreProtocol = UserStore.shared) {
-        self.sceneStore = sceneStore
-        self.userStore = userStore
+    init(sceneStore: (any SceneStoreProtocol)? = nil,
+         userStore: (any UserStoreProtocol)? = nil) {
+        self.sceneStore = sceneStore ?? SceneStore.shared
+        self.userStore = userStore ?? UserStore.shared
         setupStoreBindings()
     }
     

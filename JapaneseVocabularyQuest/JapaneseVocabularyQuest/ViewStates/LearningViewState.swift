@@ -19,10 +19,10 @@ final class LearningViewState {
     private let userStore: any UserStoreProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init(vocabularyStore: any VocabularyStoreProtocol = VocabularyStore.shared,
-         userStore: any UserStoreProtocol = UserStore.shared) {
-        self.vocabularyStore = vocabularyStore
-        self.userStore = userStore
+    init(vocabularyStore: (any VocabularyStoreProtocol)? = nil,
+         userStore: (any UserStoreProtocol)? = nil) {
+        self.vocabularyStore = vocabularyStore ?? VocabularyStore.shared
+        self.userStore = userStore ?? UserStore.shared
         setupStoreBindings()
     }
     

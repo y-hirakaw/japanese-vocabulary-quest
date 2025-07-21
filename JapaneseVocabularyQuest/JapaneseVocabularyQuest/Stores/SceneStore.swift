@@ -3,7 +3,7 @@ import Combine
 import SwiftData
 
 @MainActor
-protocol SceneStoreProtocol: ObservableObject {
+protocol SceneStoreProtocol: AnyObject {
     var scenesPublisher: Published<[LearningScene]>.Publisher { get }
     var errorPublisher: Published<Error?>.Publisher { get }
     var isLoadingPublisher: Published<Bool>.Publisher { get }
@@ -15,26 +15,22 @@ protocol SceneStoreProtocol: ObservableObject {
 
 @MainActor
 final class SceneStore: ObservableObject, SceneStoreProtocol {
-    nonisolated static let shared = SceneStore(useMockRepository: true)
+    static let shared = SceneStore()
     
-    @Published var scenes: [LearningScene] = []
-    @Published var error: Error?
-    @Published var isLoading: Bool = false
+    @Published private(set) var scenes: [LearningScene] = []
+    @Published private(set) var error: Error?
+    @Published private(set) var isLoading: Bool = false
     
     var scenesPublisher: Published<[LearningScene]>.Publisher { $scenes }
     var errorPublisher: Published<Error?>.Publisher { $error }
     var isLoadingPublisher: Published<Bool>.Publisher { $isLoading }
     
-    nonisolated private let repository: SceneRepositoryProtocol?
+    private let repository: SceneRepositoryProtocol?
     
-    /// Store初期化（nonisolated）
+    /// Store初期化
     /// useMockRepository使用時は基本場面データを自動設定
-    nonisolated init(repository: SceneRepositoryProtocol? = nil, modelContext: ModelContext? = nil, useMockRepository: Bool = false) {
-        if useMockRepository {
-            self.repository = nil
-        } else {
-            self.repository = repository
-        }
+    private init(repository: SceneRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+        self.repository = useMockRepository ? nil : repository
     }
     
     func fetchAllScenes() async {

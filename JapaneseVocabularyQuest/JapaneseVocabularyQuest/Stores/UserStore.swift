@@ -3,7 +3,7 @@ import Combine
 import SwiftData
 
 @MainActor
-protocol UserStoreProtocol: ObservableObject {
+protocol UserStoreProtocol: AnyObject {
     var currentUserPublisher: Published<User?>.Publisher { get }
     var errorPublisher: Published<Error?>.Publisher { get }
     var isLoadingPublisher: Published<Bool>.Publisher { get }
@@ -15,26 +15,22 @@ protocol UserStoreProtocol: ObservableObject {
 
 @MainActor
 final class UserStore: ObservableObject, UserStoreProtocol {
-    nonisolated static let shared = UserStore(useMockRepository: true)
+    static let shared = UserStore()
     
-    @Published var currentUser: User?
-    @Published var error: Error?
-    @Published var isLoading: Bool = false
+    @Published private(set) var currentUser: User?
+    @Published private(set) var error: Error?
+    @Published private(set) var isLoading: Bool = false
     
     var currentUserPublisher: Published<User?>.Publisher { $currentUser }
     var errorPublisher: Published<Error?>.Publisher { $error }
     var isLoadingPublisher: Published<Bool>.Publisher { $isLoading }
     
-    nonisolated private let repository: UserRepositoryProtocol?
+    private let repository: UserRepositoryProtocol?
     
-    /// Store初期化（nonisolated）
+    /// Store初期化
     /// useMockRepositoryの場合はnil設定（テスト・デモ用）
-    nonisolated init(repository: UserRepositoryProtocol? = nil, modelContext: ModelContext? = nil, useMockRepository: Bool = false) {
-        if useMockRepository {
-            self.repository = nil
-        } else {
-            self.repository = repository
-        }
+    private init(repository: UserRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+        self.repository = useMockRepository ? nil : repository
     }
     
     func fetchCurrentUser() async {

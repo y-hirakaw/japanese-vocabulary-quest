@@ -13,10 +13,10 @@ final class HomeViewState {
     private let sceneStore: any SceneStoreProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    init(userStore: any UserStoreProtocol = UserStore.shared,
-         sceneStore: any SceneStoreProtocol = SceneStore.shared) {
-        self.userStore = userStore
-        self.sceneStore = sceneStore
+    init(userStore: (any UserStoreProtocol)? = nil,
+         sceneStore: (any SceneStoreProtocol)? = nil) {
+        self.userStore = userStore ?? UserStore.shared
+        self.sceneStore = sceneStore ?? SceneStore.shared
         setupStoreBindings()
     }
     
