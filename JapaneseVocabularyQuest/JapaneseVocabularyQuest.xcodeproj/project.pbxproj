@@ -1,0 +1,580 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		6642E4E02E2E8B2E001AABBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6642E4C62E2E8B2C001AABBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6642E4CD2E2E8B2C001AABBB;
+			remoteInfo = JapaneseVocabularyQuest;
+		};
+		6642E4EA2E2E8B2E001AABBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6642E4C62E2E8B2C001AABBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6642E4CD2E2E8B2C001AABBB;
+			remoteInfo = JapaneseVocabularyQuest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6642E4CE2E2E8B2C001AABBB /* JapaneseVocabularyQuest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JapaneseVocabularyQuest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6642E4DF2E2E8B2E001AABBB /* JapaneseVocabularyQuestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JapaneseVocabularyQuestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6642E4E92E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JapaneseVocabularyQuestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6642E4F12E2E8B2E001AABBB /* Exceptions for "JapaneseVocabularyQuest" folder in "JapaneseVocabularyQuest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6642E4CD2E2E8B2C001AABBB /* JapaneseVocabularyQuest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6642E4D02E2E8B2C001AABBB /* JapaneseVocabularyQuest */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6642E4F12E2E8B2E001AABBB /* Exceptions for "JapaneseVocabularyQuest" folder in "JapaneseVocabularyQuest" target */,
+			);
+			path = JapaneseVocabularyQuest;
+			sourceTree = "<group>";
+		};
+		6642E4E22E2E8B2E001AABBB /* JapaneseVocabularyQuestTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JapaneseVocabularyQuestTests;
+			sourceTree = "<group>";
+		};
+		6642E4EC2E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JapaneseVocabularyQuestUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6642E4CB2E2E8B2C001AABBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4DC2E2E8B2E001AABBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4E62E2E8B2E001AABBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6642E4C52E2E8B2C001AABBB = {
+			isa = PBXGroup;
+			children = (
+				6642E4D02E2E8B2C001AABBB /* JapaneseVocabularyQuest */,
+				6642E4E22E2E8B2E001AABBB /* JapaneseVocabularyQuestTests */,
+				6642E4EC2E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests */,
+				6642E4CF2E2E8B2C001AABBB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6642E4CF2E2E8B2C001AABBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6642E4CE2E2E8B2C001AABBB /* JapaneseVocabularyQuest.app */,
+				6642E4DF2E2E8B2E001AABBB /* JapaneseVocabularyQuestTests.xctest */,
+				6642E4E92E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6642E4CD2E2E8B2C001AABBB /* JapaneseVocabularyQuest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6642E4F22E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuest" */;
+			buildPhases = (
+				6642E4CA2E2E8B2C001AABBB /* Sources */,
+				6642E4CB2E2E8B2C001AABBB /* Frameworks */,
+				6642E4CC2E2E8B2C001AABBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6642E4D02E2E8B2C001AABBB /* JapaneseVocabularyQuest */,
+			);
+			name = JapaneseVocabularyQuest;
+			packageProductDependencies = (
+			);
+			productName = JapaneseVocabularyQuest;
+			productReference = 6642E4CE2E2E8B2C001AABBB /* JapaneseVocabularyQuest.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6642E4DE2E2E8B2E001AABBB /* JapaneseVocabularyQuestTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6642E4F72E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuestTests" */;
+			buildPhases = (
+				6642E4DB2E2E8B2E001AABBB /* Sources */,
+				6642E4DC2E2E8B2E001AABBB /* Frameworks */,
+				6642E4DD2E2E8B2E001AABBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6642E4E12E2E8B2E001AABBB /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6642E4E22E2E8B2E001AABBB /* JapaneseVocabularyQuestTests */,
+			);
+			name = JapaneseVocabularyQuestTests;
+			packageProductDependencies = (
+			);
+			productName = JapaneseVocabularyQuestTests;
+			productReference = 6642E4DF2E2E8B2E001AABBB /* JapaneseVocabularyQuestTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6642E4E82E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6642E4FA2E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuestUITests" */;
+			buildPhases = (
+				6642E4E52E2E8B2E001AABBB /* Sources */,
+				6642E4E62E2E8B2E001AABBB /* Frameworks */,
+				6642E4E72E2E8B2E001AABBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6642E4EB2E2E8B2E001AABBB /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6642E4EC2E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests */,
+			);
+			name = JapaneseVocabularyQuestUITests;
+			packageProductDependencies = (
+			);
+			productName = JapaneseVocabularyQuestUITests;
+			productReference = 6642E4E92E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6642E4C62E2E8B2C001AABBB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					6642E4CD2E2E8B2C001AABBB = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					6642E4DE2E2E8B2E001AABBB = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 6642E4CD2E2E8B2C001AABBB;
+					};
+					6642E4E82E2E8B2E001AABBB = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 6642E4CD2E2E8B2C001AABBB;
+					};
+				};
+			};
+			buildConfigurationList = 6642E4C92E2E8B2C001AABBB /* Build configuration list for PBXProject "JapaneseVocabularyQuest" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6642E4C52E2E8B2C001AABBB;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6642E4CF2E2E8B2C001AABBB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6642E4CD2E2E8B2C001AABBB /* JapaneseVocabularyQuest */,
+				6642E4DE2E2E8B2E001AABBB /* JapaneseVocabularyQuestTests */,
+				6642E4E82E2E8B2E001AABBB /* JapaneseVocabularyQuestUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6642E4CC2E2E8B2C001AABBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4DD2E2E8B2E001AABBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4E72E2E8B2E001AABBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6642E4CA2E2E8B2C001AABBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4DB2E2E8B2E001AABBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6642E4E52E2E8B2E001AABBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6642E4E12E2E8B2E001AABBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6642E4CD2E2E8B2C001AABBB /* JapaneseVocabularyQuest */;
+			targetProxy = 6642E4E02E2E8B2E001AABBB /* PBXContainerItemProxy */;
+		};
+		6642E4EB2E2E8B2E001AABBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6642E4CD2E2E8B2C001AABBB /* JapaneseVocabularyQuest */;
+			targetProxy = 6642E4EA2E2E8B2E001AABBB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6642E4F32E2E8B2E001AABBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JapaneseVocabularyQuest/JapaneseVocabularyQuest.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JapaneseVocabularyQuest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6642E4F42E2E8B2E001AABBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JapaneseVocabularyQuest/JapaneseVocabularyQuest.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JapaneseVocabularyQuest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6642E4F52E2E8B2E001AABBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6642E4F62E2E8B2E001AABBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6642E4F82E2E8B2E001AABBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JapaneseVocabularyQuest.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JapaneseVocabularyQuest";
+			};
+			name = Debug;
+		};
+		6642E4F92E2E8B2E001AABBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JapaneseVocabularyQuest.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JapaneseVocabularyQuest";
+			};
+			name = Release;
+		};
+		6642E4FB2E2E8B2E001AABBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = JapaneseVocabularyQuest;
+			};
+			name = Debug;
+		};
+		6642E4FC2E2E8B2E001AABBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 83C8G2PSSU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.hray.JapaneseVocabularyQuestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = JapaneseVocabularyQuest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6642E4C92E2E8B2C001AABBB /* Build configuration list for PBXProject "JapaneseVocabularyQuest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6642E4F52E2E8B2E001AABBB /* Debug */,
+				6642E4F62E2E8B2E001AABBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6642E4F22E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6642E4F32E2E8B2E001AABBB /* Debug */,
+				6642E4F42E2E8B2E001AABBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6642E4F72E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuestTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6642E4F82E2E8B2E001AABBB /* Debug */,
+				6642E4F92E2E8B2E001AABBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6642E4FA2E2E8B2E001AABBB /* Build configuration list for PBXNativeTarget "JapaneseVocabularyQuestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6642E4FB2E2E8B2E001AABBB /* Debug */,
+				6642E4FC2E2E8B2E001AABBB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6642E4C62E2E8B2C001AABBB /* Project object */;
+}
