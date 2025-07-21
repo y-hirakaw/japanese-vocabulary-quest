@@ -1,7 +1,11 @@
 import SwiftUI
 
+/// アプリケーションのメインホーム画面View
+/// ユーザーの学習進捗とクイックアクション機能を表示する
 struct HomeView: View {
+    /// ホーム画面の状態管理ViewState
     @State private var viewState = HomeViewState()
+    /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {
@@ -189,8 +193,12 @@ struct HomeView: View {
     }
 }
 
+/// ユーザー作成画面View
+/// 初回起動時にユーザー名を入力してユーザーを作成する
 struct UserCreationView: View {
+    /// 入力中のユーザー名
     @State private var name: String = ""
+    /// ユーザー作成完了時のコールバック
     let onCreate: (String) async -> Void
     
     var body: some View {
@@ -239,12 +247,20 @@ struct UserCreationView: View {
     }
 }
 
+/// ホーム画面のクイックアクションカードView
+/// 学習機能へのショートカットボタンを表示する
 struct ActionCard: View {
+    /// カードタイトル
     let title: String
+    /// タイトルのふりがな
     let rubyTitle: String
+    /// カードの説明テキスト
     let description: String
+    /// 表示するSF Symbolアイコン
     let icon: String
+    /// カードのテーマカラー
     let color: Color
+    /// タップ時のアクション
     let action: () -> Void
     
     var body: some View {

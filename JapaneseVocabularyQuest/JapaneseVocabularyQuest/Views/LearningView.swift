@@ -1,9 +1,15 @@
 import SwiftUI
 
+/// 語彙学習画面View
+/// 選択した場面の語彙を問題形式で学習する
 struct LearningView: View {
+    /// 学習対象の場面
     let scene: LearningScene
+    /// 学習画面の状態管理ViewState
     @State private var viewState = LearningViewState()
+    /// 画面閉じる機能
     @Environment(\.dismiss) private var dismiss
+    /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {

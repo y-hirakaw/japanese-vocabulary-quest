@@ -2,37 +2,62 @@ import Foundation
 import Combine
 import SwiftData
 
+/// 学習場面データ管理のためのStoreプロトコル
+/// 学校生活と日常生活の場面データの状態管理を定義する
 @MainActor
 protocol SceneStoreProtocol: AnyObject {
+    /// 学習場面配列の変更を通知するPublisher
     var scenesPublisher: Published<[LearningScene]>.Publisher { get }
+    /// エラー状態の変更を通知するPublisher
     var errorPublisher: Published<Error?>.Publisher { get }
+    /// ローディング状態の変更を通知するPublisher
     var isLoadingPublisher: Published<Bool>.Publisher { get }
     
+    /// 全ての学習場面を取得
     func fetchAllScenes() async
+    
+    /// 指定したカテゴリーの学習場面を取得
+    /// - Parameter category: 場面カテゴリー
     func fetchScenesByCategory(_ category: SceneCategory) async
+    
+    /// デフォルトの学習場面データを初期化
     func initializeDefaultScenes() async
 }
 
+/// 学習場面データ管理のためのStore実装クラス
+/// SVVS アーキテクチャにおいて場面選択とコンテンツ管理を担当する
 @MainActor
 final class SceneStore: ObservableObject, SceneStoreProtocol {
+    /// 共有インスタンス（Singletonパターン）
     static let shared = SceneStore()
     
+    /// 現在取得済みの学習場面配列
     @Published private(set) var scenes: [LearningScene] = []
+    /// エラー情報（存在する場合）
     @Published private(set) var error: Error?
+    /// データ取得中の状態フラグ
     @Published private(set) var isLoading: Bool = false
     
+    /// 学習場面配列の変更を通知するPublisher
     var scenesPublisher: Published<[LearningScene]>.Publisher { $scenes }
+    /// エラー状態の変更を通知するPublisher
     var errorPublisher: Published<Error?>.Publisher { $error }
+    /// ローディング状態の変更を通知するPublisher
     var isLoadingPublisher: Published<Bool>.Publisher { $isLoading }
     
+    /// 学習場面データアクセス用のリポジトリ
     private let repository: SceneRepositoryProtocol?
     
-    /// Store初期化
-    /// useMockRepository使用時は基本場面データを自動設定
+    /// Store初期化（privateでSingleton強制）
+    /// - Parameters:
+    ///   - repository: 場面リポジトリ（テスト用）
+    ///   - useMockRepository: モックリポジトリ使用フラグ（デフォルト: true）
     private init(repository: SceneRepositoryProtocol? = nil, useMockRepository: Bool = true) {
         self.repository = useMockRepository ? nil : repository
     }
     
+    /// 全ての学習場面を非同期で取得する
+    /// リポジトリが利用不可な場合、デフォルトデータを使用する
     func fetchAllScenes() async {
         isLoading = true
         error = nil
@@ -61,6 +86,8 @@ final class SceneStore: ObservableObject, SceneStoreProtocol {
         isLoading = false
     }
     
+    /// 指定したカテゴリーの学習場面を非同期で取得する
+    /// - Parameter category: 場面カテゴリー（朝の会、授業時間等）
     func fetchScenesByCategory(_ category: SceneCategory) async {
         isLoading = true
         error = nil
@@ -82,6 +109,8 @@ final class SceneStore: ObservableObject, SceneStoreProtocol {
         isLoading = false
     }
     
+    /// デフォルトの学習場面データを初期化し、リポジトリに保存する
+    /// リポジトリが利用不可な場合、メモリ上のみに設定する
     func initializeDefaultScenes() async {
         let defaultScenes = SceneStore.createDefaultScenes()
         

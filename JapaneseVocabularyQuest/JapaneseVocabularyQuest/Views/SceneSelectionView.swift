@@ -1,7 +1,11 @@
 import SwiftUI
 
+/// 学習場面選択画面View
+/// 学校生活や日常生活の場面から学習したい場面を選択する
 struct SceneSelectionView: View {
+    /// 場面選択画面の状態管理ViewState
     @State private var viewState = SceneSelectionViewState()
+    /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {
@@ -159,6 +163,9 @@ struct SceneSelectionView: View {
         .frame(maxWidth: .infinity)
     }
     
+    /// 指定したカテゴリーが学校生活カテゴリーかどうかを判定する
+    /// - Parameter category: 判定対象のカテゴリー
+    /// - Returns: 学校生活カテゴリーの場合true
     private func isSchoolLifeCategory(_ category: SceneCategory) -> Bool {
         switch category {
         case .morningAssembly, .classTime, .lunchTime, .cleaningTime, .breakTime:
