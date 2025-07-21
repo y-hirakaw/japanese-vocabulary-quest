@@ -78,3 +78,11 @@ See `RDD.md` for comprehensive feature specifications, including:
 * このファイルには、作業のスコープ、完了の定義、進捗状況、Claude Codeでのコード生成割合を記録する
 * このファイルの目的は、上記を記録することにcompactによるコンテキスト喪失を防止
 * 作業開始と完了時に`.claude/workspace/task.md`を更新すること
+
+## 実装について
+
+* SwiftDocと、実装意図のコメントはつけるようにしてください。
+
+## ビルドについて
+
+* シュミレータは iOS16.5 の iPhone 16 にしてください
