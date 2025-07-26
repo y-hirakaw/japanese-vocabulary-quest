@@ -92,18 +92,36 @@ struct LearningView: View {
                 VStack(spacing: 24) {
                     sceneInfoHeader
                     
-                    if let vocabulary = viewState.currentVocabulary {
-                        VocabularyCard(
-                            vocabulary: vocabulary,
-                            showAnswer: viewState.showAnswer
-                        ) {
-                            if !viewState.showAnswer {
-                                Task {
-                                    await viewState.submitAnswer("")
+                    if viewState.isQuizMode {
+                        if let vocabulary = viewState.currentVocabulary {
+                            QuizModeView(
+                                vocabulary: vocabulary,
+                                choices: viewState.quizChoices,
+                                quizType: viewState.currentQuizType,
+                                selectedChoiceIndex: $viewState.selectedChoiceIndex,
+                                isAnswerSubmitted: $viewState.isAnswerSubmitted,
+                                onChoiceSelected: { index in
+                                    Task {
+                                        await viewState.selectQuizChoice(index)
+                                    }
+                                }
+                            )
+                            .animation(.easeInOut(duration: 0.3), value: viewState.selectedChoiceIndex)
+                        }
+                    } else {
+                        if let vocabulary = viewState.currentVocabulary {
+                            VocabularyCard(
+                                vocabulary: vocabulary,
+                                showAnswer: viewState.showAnswer
+                            ) {
+                                if !viewState.showAnswer {
+                                    Task {
+                                        await viewState.submitAnswer("")
+                                    }
                                 }
                             }
+                            .animation(.easeInOut(duration: 0.3), value: viewState.showAnswer)
                         }
-                        .animation(.easeInOut(duration: 0.3), value: viewState.showAnswer)
                     }
                     
                     if viewState.showAnswer {
@@ -145,26 +163,46 @@ struct LearningView: View {
     }
     
     private var answerFeedback: some View {
-        VStack(spacing: 12) {
+        let isCorrect = viewState.isQuizMode ? 
+            (viewState.selectedChoiceIndex != nil && 
+             viewState.quizChoices[viewState.selectedChoiceIndex!].id == viewState.currentVocabulary?.id) : 
+            true
+        
+        return VStack(spacing: 12) {
             HStack(spacing: 12) {
-                Image(systemName: "checkmark.circle.fill")
+                Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .font(.title2)
-                    .foregroundColor(.green)
+                    .foregroundColor(isCorrect ? .green : .red)
                 
-                Text("よくできました！")
+                Text(isCorrect ? "よくできました！" : "もう一度挑戦しよう")
                     .font(.title3)
                     .fontWeight(.semibold)
-                    .foregroundColor(.green)
+                    .foregroundColor(isCorrect ? .green : .red)
             }
             
-            Text("この語彙を覚えました")
-                .font(.body)
-                .foregroundColor(.secondary)
+            if isCorrect {
+                Text("この語彙を覚えました")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            } else if let vocabulary = viewState.currentVocabulary {
+                VStack(spacing: 8) {
+                    Text("正解は...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    RubyText(vocabulary.word, ruby: vocabulary.rubyText, fontSize: 20)
+                    
+                    Text(vocabulary.meaning)
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
         }
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.green.opacity(0.1))
+                .fill(isCorrect ? Color.green.opacity(0.1) : Color.red.opacity(0.1))
         )
     }
     
@@ -219,7 +257,7 @@ struct LearningView: View {
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(.blue)
-                        Text("回答")
+                        Text("問題数")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -244,7 +282,25 @@ struct LearningView: View {
                 )
             }
             
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
+                HStack {
+                    Image(systemName: "sparkles")
+                        .font(.body)
+                        .foregroundColor(.yellow)
+                    Text("\(viewState.correctAnswersCount * 10) ポイント獲得！")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.orange)
+                    Image(systemName: "sparkles")
+                        .font(.body)
+                        .foregroundColor(.yellow)
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.orange.opacity(0.1))
+                )
+                
                 Button(action: {
                     Task {
                         await viewState.restartLearning()

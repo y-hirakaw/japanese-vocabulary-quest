@@ -49,11 +49,16 @@ final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
     /// 語彙データアクセス用のリポジトリ
     private let repository: VocabularyRepositoryProtocol?
     
-    /// Store初期化（privateでSingleton強制）
+    /// Store初期化（Singleton用）
+    private init() {
+        self.repository = nil
+    }
+    
+    /// Store初期化（Repositoryインジェクション用）
     /// - Parameters:
-    ///   - repository: 語彙リポジトリ（テスト用）
+    ///   - repository: 語彙リポジトリ
     ///   - useMockRepository: モックリポジトリ使用フラグ（デフォルト: true）
-    private init(repository: VocabularyRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+    init(repository: VocabularyRepositoryProtocol, useMockRepository: Bool = true) {
         self.repository = useMockRepository ? nil : repository
     }
     

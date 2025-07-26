@@ -48,11 +48,16 @@ final class SceneStore: ObservableObject, SceneStoreProtocol {
     /// 学習場面データアクセス用のリポジトリ
     private let repository: SceneRepositoryProtocol?
     
-    /// Store初期化（privateでSingleton強制）
+    /// Store初期化（Singleton用）
+    private init() {
+        self.repository = nil
+    }
+    
+    /// Store初期化（Repositoryインジェクション用）
     /// - Parameters:
-    ///   - repository: 場面リポジトリ（テスト用）
+    ///   - repository: 場面リポジトリ
     ///   - useMockRepository: モックリポジトリ使用フラグ（デフォルト: true）
-    private init(repository: SceneRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+    init(repository: SceneRepositoryProtocol, useMockRepository: Bool = true) {
         self.repository = useMockRepository ? nil : repository
     }
     
