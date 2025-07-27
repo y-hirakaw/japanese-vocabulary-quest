@@ -92,8 +92,7 @@ struct QuizModeView: View {
             VStack(spacing: 8) {
                 if quizType == .imageToWord {
                     // 言葉の選択肢
-                    RubyText(choice.word, ruby: choice.rubyText, fontSize: 18)
-                        .multilineTextAlignment(.center)
+                    RubyText(choice.word, ruby: choice.rubyText, fontSize: 18, alignment: .center)
                 } else {
                     // イラストの選択肢
                     vocabularyImage(for: choice)

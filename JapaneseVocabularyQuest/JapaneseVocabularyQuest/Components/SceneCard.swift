@@ -14,8 +14,9 @@ struct SceneCard: View {
                     Text(scene.sceneDescription)
                         .font(.body)
                         .foregroundColor(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(nil)
                         .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 Spacer()
@@ -155,18 +156,9 @@ struct SceneMiniCard: View {
                         .fill(isSelected ? categoryColor : categoryColor.opacity(0.2))
                 )
             
-            VStack(spacing: 2) {
-                Text(scene.title)
-                    .font(.caption)
-                    .fontWeight(isSelected ? .semibold : .regular)
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                
-                Text(scene.rubyTitle)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            }
+            RubyText(scene.title, ruby: scene.rubyTitle, fontSize: 12, rubyFontSize: 8, alignment: .center)
+                .fontWeight(isSelected ? .semibold : .regular)
+                .lineLimit(nil)
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 4)
