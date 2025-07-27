@@ -155,6 +155,11 @@ struct LearningView: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
+            
+            // デバッグ情報
+            Text("語彙数: \(viewState.vocabularies.count) | カテゴリー: \(scene.category.displayName)")
+                .font(.caption)
+                .foregroundColor(.orange)
         }
         .padding()
         .background(

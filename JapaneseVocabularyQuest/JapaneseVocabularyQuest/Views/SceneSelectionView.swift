@@ -30,11 +30,9 @@ struct SceneSelectionView: View {
             }
             .task {
                 if viewState == nil {
-                    // 実際のRepositoryを使用してViewStateを初期化
-                    let sceneRepository = SceneRepository(modelContext: modelContext)
-                    let vocabularyRepository = VocabularyRepository(modelContext: modelContext)
-                    let sceneStore = SceneStore(repository: sceneRepository, useMockRepository: false)
-                    let vocabularyStore = VocabularyStore(repository: vocabularyRepository, useMockRepository: false)
+                    // サンプルデータを使用してViewStateを初期化
+                    let sceneStore = SceneStore.shared
+                    let vocabularyStore = VocabularyStore.shared
                     viewState = SceneSelectionViewState(sceneStore: sceneStore, vocabularyStore: vocabularyStore)
                 }
                 await viewState?.onAppear()

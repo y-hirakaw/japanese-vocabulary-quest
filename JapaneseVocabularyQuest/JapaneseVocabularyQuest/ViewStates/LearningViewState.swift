@@ -216,23 +216,44 @@ final class LearningViewState {
     private func generateQuizChoices() {
         guard let currentVocabulary = currentVocabulary else { return }
         
-        // 現在の語彙と同じカテゴリーから選択肢を選ぶ
-        let sameCategories = vocabularies.filter { $0.category == currentVocabulary.category && $0.id != currentVocabulary.id }
+        // 利用可能な全ての語彙から正解以外を選択
+        let allAvailableVocabularies = VocabularyData.allVocabularies.filter { $0.id != currentVocabulary.id }
+        
+        // 同じカテゴリーの語彙を優先的に選択
+        let sameCategories = allAvailableVocabularies.filter { $0.category == currentVocabulary.category }
+        let otherCategories = allAvailableVocabularies.filter { $0.category != currentVocabulary.category }
         
         // ダミー選択肢を3つ選ぶ
         var dummies: [Vocabulary] = []
+        
+        // まず同じカテゴリーから選択
         if sameCategories.count >= 3 {
-            // 同じカテゴリーから3つランダムに選ぶ
             dummies = Array(sameCategories.shuffled().prefix(3))
         } else {
-            // 足りない場合は全語彙から選ぶ
+            // 同じカテゴリーから全て選択
             dummies = Array(sameCategories)
-            let otherVocabularies = vocabularies.filter { $0.id != currentVocabulary.id && !sameCategories.contains($0) }
             let needed = 3 - dummies.count
-            dummies += Array(otherVocabularies.shuffled().prefix(needed))
+            
+            // 不足分は他のカテゴリーから補完
+            if needed > 0 && !otherCategories.isEmpty {
+                dummies += Array(otherCategories.shuffled().prefix(needed))
+            }
+        }
+        
+        // 最低限の選択肢が確保できない場合は、ダミーデータを生成
+        while dummies.count < 3 {
+            let dummyVocabulary = Vocabulary(
+                word: "選択肢\(dummies.count + 1)",
+                reading: "せんたくし\(dummies.count + 1)",
+                rubyText: "｜選択肢《せんたくし》\(dummies.count + 1)",
+                meaning: "ダミーの選択肢",
+                category: currentVocabulary.category,
+                difficulty: currentVocabulary.difficulty
+            )
+            dummies.append(dummyVocabulary)
         }
         
         // 正解を含めてシャッフル
-        quizChoices = ([currentVocabulary] + dummies).shuffled()
+        quizChoices = ([currentVocabulary] + Array(dummies.prefix(3))).shuffled()
     }
 }
