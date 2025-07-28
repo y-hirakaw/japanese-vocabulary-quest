@@ -22,14 +22,20 @@ final class SceneSelectionViewState {
     /// Combine購読管理用のCancellableセット
     private var cancellables = Set<AnyCancellable>()
     
+    /// 語彙データ管理Store
+    private let vocabularyStore: any VocabularyStoreProtocol
+    
     /// ViewState初期化
     /// - Parameters:
-    ///   - sceneStore: 学習場面Store（テスト用）
-    ///   - userStore: ユーザーStore（テスト用）
-    init(sceneStore: (any SceneStoreProtocol)? = nil,
-         userStore: (any UserStoreProtocol)? = nil) {
-        self.sceneStore = sceneStore ?? SceneStore.shared
+    ///   - sceneStore: 学習場面Store
+    ///   - userStore: ユーザーStore（オプショナル）
+    ///   - vocabularyStore: 語彙Store
+    init(sceneStore: any SceneStoreProtocol,
+         userStore: (any UserStoreProtocol)? = nil,
+         vocabularyStore: any VocabularyStoreProtocol) {
+        self.sceneStore = sceneStore
         self.userStore = userStore ?? UserStore.shared
+        self.vocabularyStore = vocabularyStore
         setupStoreBindings()
     }
     
