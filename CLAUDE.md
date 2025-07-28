@@ -72,8 +72,9 @@ See `RDD.md` for comprehensive feature specifications, including:
 - Swift Testing framework for new tests, XCTest for UI testing
 - Project targets Japanese elementary school vocabulary education market
 
-## .claude/workspace/task.mdについて
+## 作業完了時の必須行動
 
+* `.claude/workspace/task.md`作業進捗を記録する必要がある
 * これは作業の一時記録のファイル
 * このファイルには、作業のスコープ、完了の定義、進捗状況、Claude Codeでのコード生成割合を記録する
 * このファイルの目的は、上記を記録することにcompactによるコンテキスト喪失を防止

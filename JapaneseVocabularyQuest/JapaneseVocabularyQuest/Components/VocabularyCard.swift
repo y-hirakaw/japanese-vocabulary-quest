@@ -109,7 +109,8 @@ struct VocabularyMiniCard: View {
                 Text(vocabulary.meaning)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
             Spacer()

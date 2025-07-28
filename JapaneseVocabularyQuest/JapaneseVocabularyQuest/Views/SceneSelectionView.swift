@@ -4,7 +4,7 @@ import SwiftUI
 /// 学校生活や日常生活の場面から学習したい場面を選択する
 struct SceneSelectionView: View {
     /// 場面選択画面の状態管理ViewState
-    @State private var viewState = SceneSelectionViewState()
+    @State private var viewState: SceneSelectionViewState?
     /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
     
@@ -13,19 +13,29 @@ struct SceneSelectionView: View {
             ZStack {
                 backgroundColor
                 
-                if viewState.isLoading {
-                    loadingView
+                if let viewState = viewState {
+                    if viewState.isLoading {
+                        loadingView
+                    } else {
+                        contentView
+                    }
                 } else {
-                    contentView
+                    loadingView
                 }
             }
             .navigationTitle("場面別学習")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
-                await viewState.refreshScenes()
+                await viewState?.refreshScenes()
             }
             .task {
-                await viewState.onAppear()
+                if viewState == nil {
+                    // サンプルデータを使用してViewStateを初期化
+                    let sceneStore = SceneStore.shared
+                    let vocabularyStore = VocabularyStore.shared
+                    viewState = SceneSelectionViewState(sceneStore: sceneStore, vocabularyStore: vocabularyStore)
+                }
+                await viewState?.onAppear()
             }
         }
     }
@@ -84,15 +94,15 @@ struct SceneSelectionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(SceneCategory.allCases.filter { isSchoolLifeCategory($0) }, id: \.self) { category in
-                        let scenesForCategory = viewState.scenes.filter { $0.category == category }
+                        let scenesForCategory = viewState?.scenes.filter { $0.category == category } ?? []
                         if !scenesForCategory.isEmpty {
                             ForEach(scenesForCategory, id: \.id) { scene in
                                 SceneMiniCard(
                                     scene: scene,
-                                    isSelected: viewState.selectedCategory == category
+                                    isSelected: viewState?.selectedCategory == category
                                 ) {
                                     Task {
-                                        await viewState.selectCategory(category)
+                                        await viewState?.selectCategory(category)
                                     }
                                 }
                                 .frame(width: 80)
@@ -107,13 +117,13 @@ struct SceneSelectionView: View {
     
     private var scenesListView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if !viewState.schoolLifeScenes.isEmpty {
+            if !(viewState?.schoolLifeScenes.isEmpty ?? true) {
                 LazyVStack(spacing: 12) {
-                    ForEach(viewState.schoolLifeScenes, id: \.id) { scene in
+                    ForEach(viewState?.schoolLifeScenes ?? [], id: \.id) { scene in
                         NavigationLink(destination: LearningView(scene: scene)) {
                             SceneCard(
                                 scene: scene,
-                                progress: viewState.getProgress(for: scene)
+                                progress: viewState?.getProgress(for: scene) ?? 0
                             ) {}
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -123,18 +133,18 @@ struct SceneSelectionView: View {
                 emptyStateView
             }
             
-            if !viewState.dailyLifeScenes.isEmpty {
+            if !(viewState?.dailyLifeScenes.isEmpty ?? true) {
                 VStack(alignment: .leading, spacing: 16) {
                     RubyText("日常生活", ruby: "にちじょうせいかつ", fontSize: 20, alignment: .leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 20)
                     
                     LazyVStack(spacing: 12) {
-                        ForEach(viewState.dailyLifeScenes, id: \.id) { scene in
+                        ForEach(viewState?.dailyLifeScenes ?? [], id: \.id) { scene in
                             NavigationLink(destination: LearningView(scene: scene)) {
                                 SceneCard(
                                     scene: scene,
-                                    progress: viewState.getProgress(for: scene)
+                                    progress: viewState?.getProgress(for: scene) ?? 0
                                 ) {}
                             }
                             .buttonStyle(PlainButtonStyle())

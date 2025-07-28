@@ -51,11 +51,16 @@ final class UserStore: ObservableObject, UserStoreProtocol {
     /// ユーザーデータアクセス用のリポジトリ
     private let repository: UserRepositoryProtocol?
     
-    /// Store初期化（privateでSingleton強制）
+    /// Store初期化（Singleton用）
+    private init() {
+        self.repository = nil
+    }
+    
+    /// Store初期化（Repositoryインジェクション用）
     /// - Parameters:
-    ///   - repository: ユーザーリポジトリ（テスト用）
+    ///   - repository: ユーザーリポジトリ
     ///   - useMockRepository: モックリポジトリ使用フラグ（デフォルト: true）
-    private init(repository: UserRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+    init(repository: UserRepositoryProtocol, useMockRepository: Bool = true) {
         self.repository = useMockRepository ? nil : repository
     }
     
@@ -124,7 +129,14 @@ final class UserStore: ObservableObject, UserStoreProtocol {
             progress?.recordAnswer(isCorrect: isCorrect)
             
             if isCorrect {
-                user.totalPoints += progress?.masteryLevel ?? 1
+                // 正解時に10ポイント加算
+                user.totalPoints += 10
+                
+                // レベルアップ処理（100ポイントごとにレベルアップ）
+                let newLevel = (user.totalPoints / 100) + 1
+                if newLevel > user.level {
+                    user.level = newLevel
+                }
             }
             
             try await repository.updateProgress(progress!)

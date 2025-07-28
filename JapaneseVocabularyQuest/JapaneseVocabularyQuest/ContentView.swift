@@ -8,6 +8,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView()
+                .environment(\.modelContext, modelContext)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("ホーム")
@@ -15,6 +16,7 @@ struct ContentView: View {
                 .tag(0)
             
             SceneSelectionView()
+                .environment(\.modelContext, modelContext)
                 .tabItem {
                     Image(systemName: "book.fill")
                     Text("学習")

@@ -24,11 +24,11 @@ final class HomeViewState {
     
     /// ViewState初期化
     /// - Parameters:
-    ///   - userStore: ユーザーStore（テスト用）
-    ///   - sceneStore: 学習場面Store（テスト用）
-    init(userStore: (any UserStoreProtocol)? = nil,
+    ///   - userStore: ユーザーStore
+    ///   - sceneStore: 学習場面Store（オプショナル、必要な場合のみ）
+    init(userStore: any UserStoreProtocol,
          sceneStore: (any SceneStoreProtocol)? = nil) {
-        self.userStore = userStore ?? UserStore.shared
+        self.userStore = userStore
         self.sceneStore = sceneStore ?? SceneStore.shared
         setupStoreBindings()
     }

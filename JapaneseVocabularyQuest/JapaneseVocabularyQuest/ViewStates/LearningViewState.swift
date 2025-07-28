@@ -26,6 +26,16 @@ final class LearningViewState {
     var correctAnswersCount: Int = 0
     /// 総回答数
     var totalAnswersCount: Int = 0
+    /// クイズモードが有効かどうか
+    var isQuizMode: Bool = true
+    /// 現在のクイズタイプ
+    var currentQuizType: QuizModeView.QuizType = .imageToWord
+    /// クイズの選択肢
+    var quizChoices: [Vocabulary] = []
+    /// 選択されたクイズ選択肢のインデックス
+    var selectedChoiceIndex: Int?
+    /// 回答が提出されたかどうか
+    var isAnswerSubmitted: Bool = false
     
     /// 語彙データ管理Store
     private let vocabularyStore: any VocabularyStoreProtocol
@@ -72,6 +82,9 @@ final class LearningViewState {
     func startLearning(scene: LearningScene) async {
         currentScene = scene
         await vocabularyStore.fetchVocabularies(for: scene)
+        if isQuizMode && !vocabularies.isEmpty {
+            generateQuizChoices()
+        }
     }
     
     /// ユーザーの回答を処理し、正誤判定を行って進捗を更新
@@ -92,13 +105,44 @@ final class LearningViewState {
         showAnswer = true
     }
     
+    /// クイズの選択肢を選択したときの処理
+    /// - Parameter index: 選択肢のインデックス
+    func selectQuizChoice(_ index: Int) async {
+        guard isQuizMode, !isAnswerSubmitted else { return }
+        guard index < quizChoices.count else { return }
+        
+        selectedChoiceIndex = index
+        isAnswerSubmitted = true
+        
+        let selectedVocabulary = quizChoices[index]
+        let isCorrect = selectedVocabulary.id == currentVocabulary?.id
+        
+        if isCorrect {
+            correctAnswersCount += 1
+        }
+        totalAnswersCount += 1
+        
+        if let currentVocabulary = currentVocabulary {
+            await userStore.updateUserProgress(vocabularyId: currentVocabulary.id, isCorrect: isCorrect)
+        }
+        
+        showAnswer = true
+    }
+    
     /// 次の語彙に進む、または学習セッションを完了する
     func nextVocabulary() {
         showAnswer = false
         userAnswer = ""
+        selectedChoiceIndex = nil
+        isAnswerSubmitted = false
         
         if currentVocabularyIndex < vocabularies.count - 1 {
             currentVocabularyIndex += 1
+            if isQuizMode {
+                // クイズタイプをランダムに切り替え
+                currentQuizType = Bool.random() ? .imageToWord : .wordToImage
+                generateQuizChoices()
+            }
         } else {
             isCompleted = true
         }
@@ -112,6 +156,12 @@ final class LearningViewState {
         userAnswer = ""
         correctAnswersCount = 0
         totalAnswersCount = 0
+        selectedChoiceIndex = nil
+        isAnswerSubmitted = false
+        quizChoices = []
+        if isQuizMode && !vocabularies.isEmpty {
+            generateQuizChoices()
+        }
     }
     
     /// 現在の場面で学習を再開始する
@@ -160,5 +210,50 @@ final class LearningViewState {
     /// 残りの語彙数
     var remainingVocabularies: Int {
         return max(0, vocabularies.count - currentVocabularyIndex - 1)
+    }
+    
+    /// クイズの選択肢を生成する
+    private func generateQuizChoices() {
+        guard let currentVocabulary = currentVocabulary else { return }
+        
+        // 利用可能な全ての語彙から正解以外を選択
+        let allAvailableVocabularies = VocabularyData.allVocabularies.filter { $0.id != currentVocabulary.id }
+        
+        // 同じカテゴリーの語彙を優先的に選択
+        let sameCategories = allAvailableVocabularies.filter { $0.category == currentVocabulary.category }
+        let otherCategories = allAvailableVocabularies.filter { $0.category != currentVocabulary.category }
+        
+        // ダミー選択肢を3つ選ぶ
+        var dummies: [Vocabulary] = []
+        
+        // まず同じカテゴリーから選択
+        if sameCategories.count >= 3 {
+            dummies = Array(sameCategories.shuffled().prefix(3))
+        } else {
+            // 同じカテゴリーから全て選択
+            dummies = Array(sameCategories)
+            let needed = 3 - dummies.count
+            
+            // 不足分は他のカテゴリーから補完
+            if needed > 0 && !otherCategories.isEmpty {
+                dummies += Array(otherCategories.shuffled().prefix(needed))
+            }
+        }
+        
+        // 最低限の選択肢が確保できない場合は、ダミーデータを生成
+        while dummies.count < 3 {
+            let dummyVocabulary = Vocabulary(
+                word: "選択肢\(dummies.count + 1)",
+                reading: "せんたくし\(dummies.count + 1)",
+                rubyText: "｜選択肢《せんたくし》\(dummies.count + 1)",
+                meaning: "ダミーの選択肢",
+                category: currentVocabulary.category,
+                difficulty: currentVocabulary.difficulty
+            )
+            dummies.append(dummyVocabulary)
+        }
+        
+        // 正解を含めてシャッフル
+        quizChoices = ([currentVocabulary] + Array(dummies.prefix(3))).shuffled()
     }
 }

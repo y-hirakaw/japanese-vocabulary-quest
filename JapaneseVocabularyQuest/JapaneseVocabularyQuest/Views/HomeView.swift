@@ -4,7 +4,7 @@ import SwiftUI
 /// ユーザーの学習進捗とクイックアクション機能を表示する
 struct HomeView: View {
     /// ホーム画面の状態管理ViewState
-    @State private var viewState = HomeViewState()
+    @State private var viewState: HomeViewState?
     /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
     
@@ -13,18 +13,28 @@ struct HomeView: View {
             ZStack {
                 backgroundColor
                 
-                if viewState.isLoading {
-                    loadingView
-                } else if viewState.showUserCreation {
-                    userCreationView
+                if let viewState = viewState {
+                    if viewState.isLoading {
+                        loadingView
+                    } else if viewState.showUserCreation {
+                        userCreationView
+                    } else {
+                        homeContentView
+                    }
                 } else {
-                    homeContentView
+                    loadingView
                 }
             }
             .navigationTitle("")
             .navigationBarHidden(true)
             .task {
-                await viewState.onAppear()
+                if viewState == nil {
+                    // 実際のRepositoryを使用してViewStateを初期化
+                    let userRepository = UserRepository(modelContext: modelContext)
+                    let userStore = UserStore(repository: userRepository, useMockRepository: false)
+                    viewState = HomeViewState(userStore: userStore)
+                }
+                await viewState?.onAppear()
             }
         }
     }
@@ -51,7 +61,7 @@ struct HomeView: View {
     
     private var userCreationView: some View {
         UserCreationView { name in
-            await viewState.createUser(name: name)
+            await viewState?.createUser(name: name)
         }
     }
     
@@ -71,7 +81,7 @@ struct HomeView: View {
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
-                if let user = viewState.currentUser {
+                if let user = viewState?.currentUser {
                     Text("こんにちは！")
                         .font(.title3)
                         .foregroundColor(.secondary)
@@ -98,7 +108,7 @@ struct HomeView: View {
     
     private var userProgressView: some View {
         VStack(spacing: 16) {
-            if let user = viewState.currentUser {
+            if let user = viewState?.currentUser {
                 VStack(spacing: 12) {
                     HStack {
                         VStack(alignment: .leading) {
@@ -106,7 +116,7 @@ struct HomeView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Text("次のレベルまで \(viewState.nextLevelPoints)pt")
+                            Text("次のレベルまで \(viewState?.nextLevelPoints ?? 0)pt")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -125,7 +135,7 @@ struct HomeView: View {
                         }
                     }
                     
-                    ProgressView(value: viewState.userLevelProgress)
+                    ProgressView(value: viewState?.userLevelProgress ?? 0)
                         .progressViewStyle(LinearProgressViewStyle())
                         .accentColor(.orange)
                         .scaleEffect(y: 2.0)

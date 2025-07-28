@@ -49,11 +49,16 @@ final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
     /// 語彙データアクセス用のリポジトリ
     private let repository: VocabularyRepositoryProtocol?
     
-    /// Store初期化（privateでSingleton強制）
+    /// Store初期化（Singleton用）
+    private init() {
+        self.repository = nil
+    }
+    
+    /// Store初期化（Repositoryインジェクション用）
     /// - Parameters:
-    ///   - repository: 語彙リポジトリ（テスト用）
+    ///   - repository: 語彙リポジトリ
     ///   - useMockRepository: モックリポジトリ使用フラグ（デフォルト: true）
-    private init(repository: VocabularyRepositoryProtocol? = nil, useMockRepository: Bool = true) {
+    init(repository: VocabularyRepositoryProtocol, useMockRepository: Bool = true) {
         self.repository = useMockRepository ? nil : repository
     }
     
@@ -63,18 +68,28 @@ final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
         isLoading = true
         error = nil
         
-        guard let repository = repository else {
-            vocabularies = []
-            isLoading = false
-            return
-        }
-        
-        do {
-            let fetchedVocabularies = try await repository.fetchByScene(scene)
-            vocabularies = fetchedVocabularies
-        } catch {
-            self.error = error
-            vocabularies = []
+        if let repository = repository {
+            do {
+                let fetchedVocabularies = try await repository.fetchByScene(scene)
+                vocabularies = fetchedVocabularies
+            } catch {
+                self.error = error
+                vocabularies = []
+            }
+        } else {
+            // Repositoryが未設定の場合はサンプルデータから取得
+            let allSampleVocabularies = VocabularyData.allVocabularies
+            // 場面に対応するカテゴリー名を取得
+            let categoryForScene = getCategoryName(for: scene.category)
+            let sceneVocabularies = allSampleVocabularies.filter { $0.category == categoryForScene }
+            
+            // 場面に関連する語彙を取得、見つからない場合はランダムに5つ選択
+            if !sceneVocabularies.isEmpty {
+                vocabularies = sceneVocabularies
+            } else {
+                // フォールバック: ランダムに5つ選択
+                vocabularies = Array(allSampleVocabularies.shuffled().prefix(5))
+            }
         }
         
         isLoading = false
@@ -86,18 +101,17 @@ final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
         isLoading = true
         error = nil
         
-        guard let repository = repository else {
-            vocabularies = []
-            isLoading = false
-            return
-        }
-        
-        do {
-            let fetchedVocabularies = try await repository.fetchByCategory(category)
-            vocabularies = fetchedVocabularies
-        } catch {
-            self.error = error
-            vocabularies = []
+        if let repository = repository {
+            do {
+                let fetchedVocabularies = try await repository.fetchByCategory(category)
+                vocabularies = fetchedVocabularies
+            } catch {
+                self.error = error
+                vocabularies = []
+            }
+        } else {
+            // Repositoryが未設定の場合はサンプルデータから取得
+            vocabularies = VocabularyData.vocabularies(for: category)
         }
         
         isLoading = false
@@ -108,20 +122,45 @@ final class VocabularyStore: ObservableObject, VocabularyStoreProtocol {
         isLoading = true
         error = nil
         
-        guard let repository = repository else {
-            vocabularies = []
-            isLoading = false
-            return
-        }
-        
-        do {
-            let fetchedVocabularies = try await repository.fetchAll()
-            vocabularies = fetchedVocabularies
-        } catch {
-            self.error = error
-            vocabularies = []
+        if let repository = repository {
+            do {
+                let fetchedVocabularies = try await repository.fetchAll()
+                vocabularies = fetchedVocabularies
+            } catch {
+                self.error = error
+                vocabularies = []
+            }
+        } else {
+            // Repositoryが未設定の場合はサンプルデータから取得
+            vocabularies = VocabularyData.allVocabularies
         }
         
         isLoading = false
+    }
+    
+    /// 学習場面カテゴリーを語彙カテゴリー名に変換する
+    /// - Parameter sceneCategory: 学習場面カテゴリー
+    /// - Returns: 対応する語彙カテゴリー名
+    private func getCategoryName(for sceneCategory: SceneCategory) -> String {
+        switch sceneCategory {
+        case .morningAssembly:
+            return "朝の会・帰りの会"
+        case .classTime:
+            return "教室"
+        case .lunchTime:
+            return "給食"
+        case .cleaningTime:
+            return "掃除の時間"
+        case .breakTime:
+            return "休み時間"
+        case .homeLife:
+            return "家での生活"
+        case .shopping:
+            return "買い物"
+        case .park:
+            return "公園・遊び場"
+        case .lessons:
+            return "習い事"
+        }
     }
 }

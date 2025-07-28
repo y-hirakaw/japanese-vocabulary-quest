@@ -36,13 +36,16 @@ struct RubyText: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(textAlignment)
                 .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
             
             Text(text)
                 .font(.system(size: fontSize))
                 .foregroundColor(.primary)
                 .multilineTextAlignment(textAlignment)
                 .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(text)（\(ruby)）")
     }
