@@ -9,8 +9,7 @@ struct SceneSelectionView: View {
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 backgroundColor
                 
                 if let viewState = viewState {
@@ -22,21 +21,20 @@ struct SceneSelectionView: View {
                 } else {
                     loadingView
                 }
+        }
+        .navigationTitle("場面別学習")
+        .navigationBarTitleDisplayMode(.large)
+        .refreshable {
+            await viewState?.refreshScenes()
+        }
+        .task {
+            if viewState == nil {
+                // サンプルデータを使用してViewStateを初期化
+                let sceneStore = SceneStore.shared
+                let vocabularyStore = VocabularyStore.shared
+                viewState = SceneSelectionViewState(sceneStore: sceneStore, vocabularyStore: vocabularyStore)
             }
-            .navigationTitle("場面別学習")
-            .navigationBarTitleDisplayMode(.large)
-            .refreshable {
-                await viewState?.refreshScenes()
-            }
-            .task {
-                if viewState == nil {
-                    // サンプルデータを使用してViewStateを初期化
-                    let sceneStore = SceneStore.shared
-                    let vocabularyStore = VocabularyStore.shared
-                    viewState = SceneSelectionViewState(sceneStore: sceneStore, vocabularyStore: vocabularyStore)
-                }
-                await viewState?.onAppear()
-            }
+            await viewState?.onAppear()
         }
     }
     

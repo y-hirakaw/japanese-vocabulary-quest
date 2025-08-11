@@ -15,13 +15,15 @@ struct ContentView: View {
                 }
                 .tag(0)
             
-            SceneSelectionView()
-                .environment(\.modelContext, modelContext)
-                .tabItem {
-                    Image(systemName: "book.fill")
-                    Text("学習")
-                }
-                .tag(1)
+            NavigationView {
+                SceneSelectionView()
+                    .environment(\.modelContext, modelContext)
+            }
+            .tabItem {
+                Image(systemName: "book.fill")
+                Text("学習")
+            }
+            .tag(1)
             
             DictionaryView()
                 .tabItem {
