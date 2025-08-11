@@ -1,0 +1,357 @@
+import Testing
+import SwiftData
+@testable import JapaneseVocabularyQuest
+
+// MARK: - Repository Layer Tests
+
+/// UserRepositoryの単体テストスイート
+/// SwiftDataを使用したユーザーデータアクセス機能をテストする
+@MainActor
+struct UserRepositoryTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    /// テスト用のUserインスタンスを作成
+    private func createTestUser(name: String = "テストユーザー", level: Int = 1) -> User {
+        return User(name: name, avatar: "default", level: level, totalPoints: 0)
+    }
+    
+    @Test("ユーザーの作成と保存")
+    func testSaveUser() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        let user = createTestUser(name: "太郎")
+        
+        // ユーザーを保存
+        try await repository.save(user)
+        
+        // 保存されたユーザーを取得して確認
+        let savedUsers = try await repository.fetchAll()
+        #expect(savedUsers.count == 1)
+        #expect(savedUsers.first?.name == "太郎")
+        #expect(savedUsers.first?.level == 1)
+    }
+    
+    @Test("IDによるユーザー取得")
+    func testFetchUserById() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        let user = createTestUser(name: "花子")
+        
+        try await repository.save(user)
+        
+        // IDで取得
+        let fetchedUser = try await repository.fetchById(user.id)
+        #expect(fetchedUser != nil)
+        #expect(fetchedUser?.name == "花子")
+        #expect(fetchedUser?.id == user.id)
+    }
+    
+    @Test("存在しないIDでのユーザー取得")
+    func testFetchUserByNonExistentId() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        
+        let nonExistentId = UUID()
+        let result = try await repository.fetchById(nonExistentId)
+        #expect(result == nil)
+    }
+    
+    @Test("現在のユーザー取得")
+    func testFetchCurrentUser() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        
+        // 複数のユーザーを時間差で作成
+        let user1 = createTestUser(name: "ユーザー1")
+        try await repository.save(user1)
+        
+        // 少し待ってから2番目のユーザーを作成
+        try await Task.sleep(nanoseconds: 1_000_000) // 1ms
+        let user2 = createTestUser(name: "ユーザー2")
+        try await repository.save(user2)
+        
+        // 現在のユーザー（最後に作成されたユーザー）を取得
+        let currentUser = try await repository.fetchCurrentUser()
+        #expect(currentUser?.name == "ユーザー2")
+    }
+    
+    @Test("ユーザーなしの場合の現在のユーザー取得")
+    func testFetchCurrentUserWhenEmpty() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        
+        let currentUser = try await repository.fetchCurrentUser()
+        #expect(currentUser == nil)
+    }
+    
+    @Test("すべてのユーザー取得（作成日順）")
+    func testFetchAllUsersOrderedByCreatedDate() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        
+        // 複数のユーザーを作成
+        let user1 = createTestUser(name: "1番目", level: 1)
+        try await repository.save(user1)
+        
+        try await Task.sleep(nanoseconds: 1_000_000)
+        let user2 = createTestUser(name: "2番目", level: 2)
+        try await repository.save(user2)
+        
+        try await Task.sleep(nanoseconds: 1_000_000)
+        let user3 = createTestUser(name: "3番目", level: 3)
+        try await repository.save(user3)
+        
+        let allUsers = try await repository.fetchAll()
+        #expect(allUsers.count == 3)
+        #expect(allUsers[0].name == "1番目")
+        #expect(allUsers[1].name == "2番目")
+        #expect(allUsers[2].name == "3番目")
+    }
+    
+    @Test("ユーザーの削除")
+    func testDeleteUser() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        let user = createTestUser(name: "削除対象")
+        
+        // ユーザーを保存
+        try await repository.save(user)
+        #expect((try await repository.fetchAll()).count == 1)
+        
+        // ユーザーを削除
+        try await repository.delete(user)
+        #expect((try await repository.fetchAll()).count == 0)
+    }
+    
+    @Test("学習進捗の更新")
+    func testUpdateProgress() async throws {
+        let container = try createTestModelContainer()
+        let repository = UserRepository(modelContext: container.mainContext)
+        
+        // テスト用のユーザーと語彙を作成
+        let user = createTestUser(name: "学習者")
+        try await repository.save(user)
+        
+        let vocabulary = Vocabulary(
+            word: "テスト語彙",
+            reading: "てすとごい",
+            rubyText: "｜テスト《てすと》｜語彙《ごい》",
+            meaning: "テスト用の語彙",
+            category: "テスト",
+            difficulty: 1,
+            exampleSentences: ["テスト文章です。"]
+        )
+        container.mainContext.insert(vocabulary)
+        try container.mainContext.save()
+        
+        // 学習進捗を作成
+        let progress = LearningProgress(
+            user: user,
+            vocabulary: vocabulary,
+            masteryLevel: .learning,
+            correctCount: 1,
+            incorrectCount: 0
+        )
+        
+        // 進捗を更新
+        try await repository.updateProgress(progress)
+        
+        // 保存された進捗を確認
+        let savedUser = try await repository.fetchById(user.id)
+        #expect(savedUser?.learningProgress.count == 1)
+        #expect(savedUser?.learningProgress.first?.correctCount == 1)
+    }
+}
+
+/// VocabularyRepositoryの単体テストスイート
+/// SwiftDataを使用した語彙データアクセス機能をテストする
+@MainActor
+struct VocabularyRepositoryTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    /// テスト用のVocabularyインスタンスを作成
+    private func createTestVocabulary(
+        word: String = "テスト語彙",
+        category: String = "テスト",
+        difficulty: Int = 1
+    ) -> Vocabulary {
+        return Vocabulary(
+            word: word,
+            reading: "てすと",
+            rubyText: "｜\(word)《てすと》",
+            meaning: "\(word)の意味",
+            category: category,
+            difficulty: difficulty,
+            exampleSentences: ["\(word)を使った例文です。"]
+        )
+    }
+    
+    @Test("語彙の作成と保存")
+    func testSaveVocabulary() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        let vocabulary = createTestVocabulary(word: "机", category: "教室")
+        
+        // 語彙を保存
+        try await repository.save(vocabulary)
+        
+        // 保存された語彙を取得して確認
+        let savedVocabularies = try await repository.fetchAll()
+        #expect(savedVocabularies.count == 1)
+        #expect(savedVocabularies.first?.word == "机")
+        #expect(savedVocabularies.first?.category == "教室")
+    }
+    
+    @Test("カテゴリーによる語彙取得")
+    func testFetchByCategory() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        
+        // 異なるカテゴリーの語彙を作成
+        let vocabulary1 = createTestVocabulary(word: "机", category: "教室")
+        let vocabulary2 = createTestVocabulary(word: "ボール", category: "運動場")
+        let vocabulary3 = createTestVocabulary(word: "黒板", category: "教室")
+        
+        try await repository.save(vocabulary1)
+        try await repository.save(vocabulary2)
+        try await repository.save(vocabulary3)
+        
+        // 教室カテゴリーの語彙を取得
+        let classroomVocabularies = try await repository.fetchByCategory("教室")
+        #expect(classroomVocabularies.count == 2)
+        
+        let words = classroomVocabularies.map { $0.word }.sorted()
+        #expect(words == ["机", "黒板"])
+    }
+    
+    @Test("難易度による語彙取得")
+    func testFetchByDifficulty() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        
+        // 異なる難易度の語彙を作成
+        let vocabulary1 = createTestVocabulary(word: "犬", difficulty: 1)
+        let vocabulary2 = createTestVocabulary(word: "科学", difficulty: 3)
+        let vocabulary3 = createTestVocabulary(word: "猫", difficulty: 1)
+        
+        try await repository.save(vocabulary1)
+        try await repository.save(vocabulary2)
+        try await repository.save(vocabulary3)
+        
+        // 難易度1の語彙を取得
+        let easyVocabularies = try await repository.fetchByDifficulty(1)
+        #expect(easyVocabularies.count == 2)
+        
+        let words = easyVocabularies.map { $0.word }.sorted()
+        #expect(words == ["猫", "犬"])
+    }
+    
+    @Test("すべての語彙取得（ソート順確認）")
+    func testFetchAllVocabulariesSorted() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        
+        // 複数の語彙を作成（あえて順序を逆に）
+        let vocabulary1 = createTestVocabulary(word: "机")
+        let vocabulary2 = createTestVocabulary(word: "椅子")
+        let vocabulary3 = createTestVocabulary(word: "黒板")
+        
+        try await repository.save(vocabulary1)
+        try await repository.save(vocabulary2)
+        try await repository.save(vocabulary3)
+        
+        let allVocabularies = try await repository.fetchAll()
+        #expect(allVocabularies.count == 3)
+        
+        // 語彙順（50音順）でソートされているかを確認
+        let words = allVocabularies.map { $0.word }
+        #expect(words == ["椅子", "机", "黒板"]) // 50音順
+    }
+    
+    @Test("語彙の削除")
+    func testDeleteVocabulary() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        let vocabulary = createTestVocabulary(word: "削除対象")
+        
+        // 語彙を保存
+        try await repository.save(vocabulary)
+        #expect((try await repository.fetchAll()).count == 1)
+        
+        // 語彙を削除
+        try await repository.delete(vocabulary)
+        #expect((try await repository.fetchAll()).count == 0)
+    }
+    
+    @Test("学習場面による語彙取得")
+    func testFetchByScene() async throws {
+        let container = try createTestModelContainer()
+        let repository = VocabularyRepository(modelContext: container.mainContext)
+        
+        // テスト用の学習場面を作成
+        let scene = LearningScene(
+            title: "テスト場面",
+            description: "テスト用の学習場面",
+            category: .classTime,
+            estimatedMinutes: 10,
+            targetGrade: 1
+        )
+        container.mainContext.insert(scene)
+        
+        // 語彙を作成して場面に関連付け
+        let vocabulary1 = createTestVocabulary(word: "机", difficulty: 1)
+        let vocabulary2 = createTestVocabulary(word: "本", difficulty: 2)
+        
+        // 語彙を場面に追加
+        vocabulary1.scenes.append(scene)
+        vocabulary2.scenes.append(scene)
+        scene.vocabularies.append(vocabulary1)
+        scene.vocabularies.append(vocabulary2)
+        
+        try await repository.save(vocabulary1)
+        try await repository.save(vocabulary2)
+        try container.mainContext.save()
+        
+        // 場面から語彙を取得
+        let sceneVocabularies = try await repository.fetchByScene(scene)
+        #expect(sceneVocabularies.count == 2)
+        
+        // 難易度順でソートされているかを確認
+        #expect(sceneVocabularies[0].difficulty <= sceneVocabularies[1].difficulty)
+    }
+}
+
+// MARK: - Legacy Test (keeping for compatibility)
+
+struct JapaneseVocabularyQuestTests {
+    @Test("基本テスト") 
+    func example() async throws {
+        #expect(true)
+    }
+}

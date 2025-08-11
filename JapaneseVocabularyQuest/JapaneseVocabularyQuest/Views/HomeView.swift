@@ -20,6 +20,8 @@ struct HomeView: View {
                         userCreationView
                     } else {
                         homeContentView
+                            .accessibilityElement(children: .contain)
+                            .accessibilityIdentifier("home_view")
                     }
                 } else {
                     loadingView
@@ -146,6 +148,8 @@ struct HomeView: View {
                         .fill(Color(UIColor.systemBackground))
                         .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
                 )
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("user_profile")
             }
         }
     }
@@ -233,24 +237,20 @@ struct UserCreationView: View {
                             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                     )
                     .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("user_name_input")
                 
-                Button(action: {
+                Button("ユーザーを作る") {
                     Task {
                         await onCreate(name)
                     }
-                }) {
-                    Text("始める")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.blue)
-                        )
                 }
+                .buttonStyle(.borderedProminent)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, minHeight: 50)
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .opacity(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.6 : 1.0)
+                .accessibilityIdentifier("create_user_button")
             }
         }
         .padding(32)

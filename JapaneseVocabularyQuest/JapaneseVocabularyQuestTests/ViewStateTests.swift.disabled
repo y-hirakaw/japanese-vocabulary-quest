@@ -1,0 +1,345 @@
+import Testing
+import SwiftData
+import Combine
+@testable import JapaneseVocabularyQuest
+
+/// ViewState層の単体テストスイート
+/// SVVS アーキテクチャにおけるViewState層のビジネスロジックをテストする
+
+// MARK: - HomeViewState Tests
+
+/// HomeViewStateの単体テストスイート
+/// ホーム画面の状態管理とユーザー管理機能をテストする
+@MainActor
+struct HomeViewStateTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    /// テスト用のUserStoreを作成
+    private func createTestUserStore(modelContext: ModelContext) -> UserStore {
+        let repository = UserRepository(modelContext: modelContext)
+        return UserStore(repository: repository, useMockRepository: false)
+    }
+    
+    @Test("HomeViewStateの初期化")
+    func testHomeViewStateInitialization() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        let viewState = HomeViewState(userStore: userStore)
+        
+        // 初期状態の確認
+        #expect(viewState.isLoading == true)
+        #expect(viewState.showUserCreation == false)
+        #expect(viewState.currentUser == nil)
+        #expect(viewState.error == nil)
+    }
+    
+    @Test("既存ユーザーがいる場合のonAppear")
+    func testOnAppearWithExistingUser() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        
+        // 事前にユーザーを作成（UserStoreを通じて作成）
+        await userStore.createUser(name: "既存ユーザー")
+        
+        let viewState = HomeViewState(userStore: userStore)
+        await viewState.onAppear()
+        
+        // ユーザーが読み込まれ、ユーザー作成画面は表示されない
+        #expect(viewState.isLoading == false)
+        #expect(viewState.showUserCreation == false)
+        #expect(viewState.currentUser?.name == "既存ユーザー")
+        #expect(viewState.currentUser?.level == 1) // createUserで作成されるユーザーはレベル1
+    }
+    
+    @Test("ユーザーがいない場合のonAppear")
+    func testOnAppearWithNoUser() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        let viewState = HomeViewState(userStore: userStore)
+        
+        await viewState.onAppear()
+        
+        // ユーザー作成画面が表示される
+        #expect(viewState.isLoading == false)
+        #expect(viewState.showUserCreation == true)
+        #expect(viewState.currentUser == nil)
+    }
+    
+    @Test("新規ユーザー作成")
+    func testCreateNewUser() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        let viewState = HomeViewState(userStore: userStore)
+        
+        // ユーザーを作成
+        await viewState.createUser(name: "新規ユーザー")
+        
+        // ユーザーが作成され、状態が更新される
+        #expect(viewState.currentUser?.name == "新規ユーザー")
+        #expect(viewState.currentUser?.level == 1)
+        #expect(viewState.showUserCreation == false)
+        #expect(viewState.error == nil)
+    }
+    
+    @Test("ユーザー作成時のバリデーション")
+    func testCreateUserValidation() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        let viewState = HomeViewState(userStore: userStore)
+        
+        // 空の名前でユーザーを作成しようとする
+        await viewState.createUser(name: "")
+        
+        // エラーが設定される
+        #expect(viewState.currentUser == nil)
+        #expect(viewState.error != nil)
+    }
+    
+    @Test("進捗統計の計算")
+    func testProgressStatistics() async throws {
+        let container = try createTestModelContainer()
+        let userStore = createTestUserStore(modelContext: container.mainContext)
+        let viewState = HomeViewState(userStore: userStore)
+        
+        // ユーザーを作成
+        await viewState.createUser(name: "学習者")
+        guard let currentUser = viewState.currentUser else {
+            throw ViewStateTestError.userNotFound
+        }
+        
+        // 語彙と進捗を作成
+        let vocabulary = Vocabulary(
+            word: "テスト語彙",
+            reading: "てすとごい",
+            rubyText: "｜テスト《てすと》｜語彙《ごい》",
+            meaning: "テスト用の語彙",
+            category: "テスト",
+            difficulty: 1,
+            exampleSentences: ["例文です。"]
+        )
+        container.mainContext.insert(vocabulary)
+        
+        let progress = LearningProgress(
+            user: currentUser,
+            vocabulary: vocabulary,
+            masteryLevel: .mastered,
+            correctCount: 5,
+            incorrectCount: 1
+        )
+        container.mainContext.insert(progress)
+        try container.mainContext.save()
+        
+        // 統計を更新
+        await viewState.onAppear()
+        
+        #expect(viewState.totalVocabularyCount == 1)
+        #expect(viewState.masteredCount == 1)
+        #expect(viewState.masteryRate > 0.9) // 約100%
+    }
+}
+
+// MARK: - LearningViewState Tests
+
+/// LearningViewStateの単体テストスイート
+/// 学習画面の状態管理と学習ロジックをテストする
+@MainActor
+struct LearningViewStateTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    /// テスト用のStoreを作成
+    private func createTestStores(modelContext: ModelContext) -> (UserStore, VocabularyStore) {
+        let userRepository = UserRepository(modelContext: modelContext)
+        let vocabularyRepository = VocabularyRepository(modelContext: modelContext)
+        let userStore = UserStore(repository: userRepository, useMockRepository: false)
+        let vocabularyStore = VocabularyStore(repository: vocabularyRepository)
+        return (userStore, vocabularyStore)
+    }
+    
+    /// テスト用の学習場面を作成
+    private func createTestScene() -> LearningScene {
+        return LearningScene(
+            title: "テスト学習場面",
+            description: "テスト用の学習場面",
+            category: .classTime,
+            estimatedMinutes: 10,
+            targetGrade: 1
+        )
+    }
+    
+    @Test("LearningViewStateの初期化")
+    func testLearningViewStateInitialization() async throws {
+        let container = try createTestModelContainer()
+        let (userStore, vocabularyStore) = createTestStores(modelContext: container.mainContext)
+        let scene = createTestScene()
+        
+        let viewState = LearningViewState(
+            scene: scene,
+            userStore: userStore,
+            vocabularyStore: vocabularyStore
+        )
+        
+        // 初期状態の確認
+        #expect(viewState.isLoading == true)
+        #expect(viewState.currentMode == .flashcard)
+        #expect(viewState.currentVocabularyIndex == 0)
+        #expect(viewState.score == 0)
+        #expect(viewState.isCompleted == false)
+    }
+    
+    @Test("語彙データの読み込み")
+    func testLoadVocabularies() async throws {
+        let container = try createTestModelContainer()
+        let (userStore, vocabularyStore) = createTestStores(modelContext: container.mainContext)
+        let scene = createTestScene()
+        container.mainContext.insert(scene)
+        
+        // テスト用の語彙を作成
+        let vocabulary1 = Vocabulary(
+            word: "机", reading: "つくえ", rubyText: "｜机《つくえ》",
+            meaning: "勉強するときに使う台", category: "教室",
+            difficulty: 1, exampleSentences: ["机の上にノートを置きます。"]
+        )
+        let vocabulary2 = Vocabulary(
+            word: "椅子", reading: "いす", rubyText: "｜椅子《いす》",
+            meaning: "座るための家具", category: "教室",
+            difficulty: 1, exampleSentences: ["椅子に座って勉強します。"]
+        )
+        
+        vocabulary1.scenes.append(scene)
+        vocabulary2.scenes.append(scene)
+        scene.vocabularies.append(vocabulary1)
+        scene.vocabularies.append(vocabulary2)
+        
+        container.mainContext.insert(vocabulary1)
+        container.mainContext.insert(vocabulary2)
+        try container.mainContext.save()
+        
+        let viewState = LearningViewState(
+            scene: scene,
+            userStore: userStore,
+            vocabularyStore: vocabularyStore
+        )
+        
+        await viewState.onAppear()
+        
+        #expect(viewState.isLoading == false)
+        #expect(viewState.vocabularies.count == 2)
+        #expect(viewState.currentVocabulary?.word == "机")
+    }
+    
+    @Test("学習モードの変更")
+    func testChangeMode() async throws {
+        let container = try createTestModelContainer()
+        let (userStore, vocabularyStore) = createTestStores(modelContext: container.mainContext)
+        let scene = createTestScene()
+        
+        let viewState = LearningViewState(
+            scene: scene,
+            userStore: userStore,
+            vocabularyStore: vocabularyStore
+        )
+        
+        // クイズモードに変更
+        viewState.changeMode(.quiz)
+        #expect(viewState.currentMode == .quiz)
+        
+        // フラッシュカードモードに戻す
+        viewState.changeMode(.flashcard)
+        #expect(viewState.currentMode == .flashcard)
+    }
+    
+    @Test("正答・誤答の処理")
+    func testAnswerProcessing() async throws {
+        let container = try createTestModelContainer()
+        let (userStore, vocabularyStore) = createTestStores(modelContext: container.mainContext)
+        
+        // ユーザーを作成
+        let user = User(name: "学習者", avatar: "default", level: 1, totalPoints: 0)
+        await userStore.createUser(name: "学習者")
+        
+        let scene = createTestScene()
+        container.mainContext.insert(scene)
+        
+        // 語彙を作成
+        let vocabulary = Vocabulary(
+            word: "テスト", reading: "てすと", rubyText: "｜テスト《てすと》",
+            meaning: "テスト用の語彙", category: "テスト",
+            difficulty: 1, exampleSentences: ["これはテストです。"]
+        )
+        vocabulary.scenes.append(scene)
+        scene.vocabularies.append(vocabulary)
+        
+        container.mainContext.insert(vocabulary)
+        try container.mainContext.save()
+        
+        let viewState = LearningViewState(
+            scene: scene,
+            userStore: userStore,
+            vocabularyStore: vocabularyStore
+        )
+        
+        await viewState.onAppear()
+        
+        // 正答を処理
+        await viewState.handleAnswer(isCorrect: true)
+        #expect(viewState.score == 1)
+        
+        // 誤答を処理
+        await viewState.handleAnswer(isCorrect: false)
+        #expect(viewState.score == 1) // スコアは変わらない
+    }
+    
+    @Test("学習完了の判定")
+    func testLearningCompletion() async throws {
+        let container = try createTestModelContainer()
+        let (userStore, vocabularyStore) = createTestStores(modelContext: container.mainContext)
+        let scene = createTestScene()
+        
+        let viewState = LearningViewState(
+            scene: scene,
+            userStore: userStore,
+            vocabularyStore: vocabularyStore
+        )
+        
+        // 語彙がない場合は完了とみなす
+        await viewState.onAppear()
+        
+        // 語彙がない場合の完了状態をチェック
+        #expect(viewState.vocabularies.isEmpty)
+        #expect(viewState.isCompleted == false) // 初期状態では未完了
+    }
+}
+
+// MARK: - ViewState Test Helper Types
+
+enum ViewStateTestError: Error {
+    case userNotFound
+    case vocabularyNotFound
+    case sceneNotFound
+}

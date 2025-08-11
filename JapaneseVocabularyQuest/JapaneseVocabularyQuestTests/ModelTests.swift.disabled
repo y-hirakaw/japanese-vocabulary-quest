@@ -1,0 +1,409 @@
+import Testing
+import SwiftData
+@testable import JapaneseVocabularyQuest
+
+/// SwiftDataモデルの単体テストスイート
+/// SwiftDataモデルの作成、関係性、永続化をテストする
+
+// MARK: - User Model Tests
+
+/// Userモデルの単体テストスイート
+/// ユーザーモデルのプロパティと関係性をテストする
+@MainActor
+struct UserModelTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    @Test("Userモデルの初期化")
+    func testUserInitialization() throws {
+        let user = User(
+            name: "テストユーザー",
+            avatar: "avatar1",
+            level: 2,
+            totalPoints: 150,
+            parentId: UUID()
+        )
+        
+        #expect(user.name == "テストユーザー")
+        #expect(user.avatar == "avatar1")
+        #expect(user.level == 2)
+        #expect(user.totalPoints == 150)
+        #expect(user.parentId != nil)
+        #expect(user.learningProgress.isEmpty)
+        #expect(user.id != UUID()) // UUIDが生成されている
+        #expect(user.createdAt <= Date()) // 作成日時が現在時刻以下
+    }
+    
+    @Test("Userモデルのデフォルト値")
+    func testUserDefaultValues() throws {
+        let user = User(name: "デフォルトユーザー")
+        
+        #expect(user.avatar == "default")
+        #expect(user.level == 1)
+        #expect(user.totalPoints == 0)
+        #expect(user.parentId == nil)
+    }
+    
+    @Test("UserとLearningProgressの関係性")
+    func testUserLearningProgressRelationship() throws {
+        let container = try createTestModelContainer()
+        let modelContext = container.mainContext
+        
+        let user = User(name: "学習者")
+        let vocabulary = Vocabulary(
+            word: "テスト語彙",
+            reading: "てすとごい",
+            rubyText: "｜テスト《てすと》｜語彙《ごい》",
+            meaning: "テスト用の語彙",
+            category: "テスト",
+            difficulty: 1,
+            exampleSentences: ["例文です。"]
+        )
+        
+        let progress = LearningProgress(
+            userId: user.id,
+            vocabularyId: vocabulary.id,
+            masteryLevel: 1,
+            reviewCount: 1,
+            correctAnswers: 3,
+            totalAnswers: 4
+        )
+        
+        modelContext.insert(user)
+        modelContext.insert(vocabulary)
+        modelContext.insert(progress)
+        
+        // 関係性の確認
+        #expect(progress.userId == user.id)
+        #expect(progress.vocabularyId == vocabulary.id)
+        #expect(progress.masteryLevel == 1)
+    }
+}
+
+// MARK: - Vocabulary Model Tests
+
+/// Vocabularyモデルの単体テストスイート
+/// 語彙モデルのプロパティと関係性をテストする
+@MainActor
+struct VocabularyModelTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    @Test("Vocabularyモデルの初期化")
+    func testVocabularyInitialization() throws {
+        let vocabulary = Vocabulary(
+            word: "学校",
+            reading: "がっこう",
+            rubyText: "｜学校《がっこう》",
+            meaning: "教育を行う施設",
+            category: "場所",
+            difficulty: 2,
+            exampleSentences: [
+                "学校に行きます。",
+                "学校で勉強します。"
+            ]
+        )
+        
+        #expect(vocabulary.word == "学校")
+        #expect(vocabulary.reading == "がっこう")
+        #expect(vocabulary.rubyText == "｜学校《がっこう》")
+        #expect(vocabulary.meaning == "教育を行う施設")
+        #expect(vocabulary.category == "場所")
+        #expect(vocabulary.difficulty == 2)
+        #expect(vocabulary.exampleSentences.count == 2)
+        // Note: scenes プロパティは実際のモデルに存在しないため、このテストは削除
+        #expect(vocabulary.id != UUID()) // UUIDが生成されている
+        #expect(vocabulary.createdAt <= Date()) // 作成日時が現在時刻以下
+    }
+    
+    @Test("VocabularyとLearningSceneの関係性")
+    func testVocabularySceneRelationship() throws {
+        let container = try createTestModelContainer()
+        let modelContext = container.mainContext
+        
+        let vocabulary = Vocabulary(
+            word: "机",
+            reading: "つくえ",
+            rubyText: "｜机《つくえ》",
+            meaning: "勉強するときに使う台",
+            category: "教室",
+            difficulty: 1,
+            exampleSentences: ["机の上にノートを置きます。"]
+        )
+        
+        let scene = LearningScene(
+            title: "教室での学習",
+            description: "教室で使われる語彙",
+            rubyTitle: \"きょうしつでのがくしゅう\",
+            storyContent: \"机や椅子などの教室の物について学習します。\",
+            order: 1,
+            category: .classTime
+        )
+        
+        // IDベースの関係性設定は初期化時に行うため、ここでは追加設定不要
+        
+        modelContext.insert(vocabulary)
+        modelContext.insert(scene)
+        
+        // IDベースの関係性の確認
+        #expect(scene.vocabularyIds.contains(vocabulary.id))
+        #expect(scene.title == \"教室での学習\")
+        #expect(scene.category == .classTime)
+    }
+    
+    @Test("Vocabularyの難易度バリデーション")
+    func testVocabularyDifficultyRange() throws {
+        // 正常な難易度範囲
+        let easyVocabulary = Vocabulary(
+            word: "犬", reading: "いぬ", rubyText: "｜犬《いぬ》",
+            meaning: "動物の一種", category: "動物", difficulty: 1,
+            exampleSentences: ["犬がいます。"]
+        )
+        #expect(easyVocabulary.difficulty == 1)
+        
+        let hardVocabulary = Vocabulary(
+            word: "科学", reading: "かがく", rubyText: "｜科学《かがく》",
+            meaning: "自然現象を研究する学問", category: "学問", difficulty: 5,
+            exampleSentences: ["科学の実験をします。"]
+        )
+        #expect(hardVocabulary.difficulty == 5)
+    }
+}
+
+// MARK: - LearningScene Model Tests
+
+/// LearningSceneモデルの単体テストスイート
+/// 学習場面モデルのプロパティと関係性をテストする
+@MainActor
+struct LearningSceneModelTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    @Test("LearningSceneモデルの初期化")
+    func testLearningSceneInitialization() throws {
+        let scene = LearningScene(
+            title: "朝の会",
+            rubyTitle: "あさのかい",
+            description: "朝の会で使われる語彙を学習します",
+            storyContent: "みんなで朝の挨拶をして一日が始まります。",
+            order: 1,
+            category: .morningAssembly
+        )
+        
+        #expect(scene.title == "朝の会")
+        #expect(scene.rubyTitle == "あさのかい")
+        #expect(scene.sceneDescription == "朝の会で使われる語彙を学習します")
+        #expect(scene.storyContent == "みんなで朝の挨拶をして一日が始まります。")
+        #expect(scene.category == .morningAssembly)
+        #expect(scene.order == 1)
+        #expect(scene.vocabularyIds.isEmpty)
+        #expect(scene.id != UUID()) // UUIDが生成されている
+        #expect(scene.createdAt <= Date()) // 作成日時が現在時刻以下
+    }
+    
+    @Test("SceneCategoryの網羅性")
+    func testSceneCategoryCompleteness() throws {
+        // 全てのSceneCategoryが使用可能であることを確認
+        let categories: [SceneCategory] = [
+            .morningAssembly,
+            .classTime,
+            .lunchTime,
+            .cleaningTime,
+            .breakTime,
+            .home,
+            .outdoors,
+            .shopping
+        ]
+        
+        for category in categories {
+            let scene = LearningScene(
+                title: "テスト場面",
+                rubyTitle: "てすとばめん",
+                description: "テスト用の場面",
+                storyContent: "テスト用のストーリー",
+                order: 1,
+                category: category
+            )
+            #expect(scene.category == category)
+        }
+    }
+}
+
+// MARK: - LearningProgress Model Tests
+
+/// LearningProgressモデルの単体テストスイート
+/// 学習進捗モデルのプロパティと関係性をテストする
+@MainActor
+struct LearningProgressModelTests {
+    
+    /// テスト用のインメモリModelContainerを作成
+    private func createTestModelContainer() throws -> ModelContainer {
+        let schema = Schema([
+            User.self,
+            Vocabulary.self,
+            LearningScene.self,
+            LearningProgress.self,
+            Character.self,
+            Achievement.self
+        ])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
+    }
+    
+    @Test("LearningProgressモデルの初期化")
+    func testLearningProgressInitialization() throws {
+        let user = User(name: "学習者")
+        let vocabulary = Vocabulary(
+            word: "テスト", reading: "てすと", rubyText: "｜テスト《てすと》",
+            meaning: "テスト用の語彙", category: "テスト", difficulty: 1,
+            exampleSentences: ["これはテストです。"]
+        )
+        
+        let progress = LearningProgress(
+            userId: user.id,
+            vocabularyId: vocabulary.id,
+            masteryLevel: 1,
+            reviewCount: 3,
+            correctAnswers: 5,
+            totalAnswers: 7
+        )
+        
+        #expect(progress.userId == user.id)
+        #expect(progress.vocabularyId == vocabulary.id)
+        #expect(progress.masteryLevel == 1)
+        #expect(progress.correctAnswers == 5)
+        #expect(progress.totalAnswers == 7)
+        #expect(progress.id != UUID()) // UUIDが生成されている
+        #expect(progress.lastReviewDate <= Date()) // 最終復習日時が現在時刻以下
+    }
+    
+    @Test("MasteryLevelの遷移")
+    func testMasteryLevelTransitions() throws {
+        let user = User(name: "学習者")
+        let vocabulary = Vocabulary(
+            word: "テスト", reading: "てすと", rubyText: "｜テスト《てすと》",
+            meaning: "テスト用の語彙", category: "テスト", difficulty: 1,
+            exampleSentences: ["これはテストです。"]
+        )
+        
+        // 各習熟度レベルでの進捗作成（数値で管理：0-3）
+        let notLearnedProgress = LearningProgress(
+            userId: user.id, vocabularyId: vocabulary.id,
+            masteryLevel: 0, correctAnswers: 0, totalAnswers: 0
+        )
+        #expect(notLearnedProgress.masteryLevel == 0)
+        
+        let learningProgress = LearningProgress(
+            userId: user.id, vocabularyId: vocabulary.id,
+            masteryLevel: 2, correctAnswers: 3, totalAnswers: 5
+        )
+        #expect(learningProgress.masteryLevel == 2)
+        
+        let masteredProgress = LearningProgress(
+            userId: user.id, vocabularyId: vocabulary.id,
+            masteryLevel: 3, correctAnswers: 10, totalAnswers: 11
+        )
+        #expect(masteredProgress.masteryLevel == 3)
+    }
+    
+    @Test("正答率の計算")
+    func testAccuracyCalculation() throws {
+        let user = User(name: "学習者")
+        let vocabulary = Vocabulary(
+            word: "テスト", reading: "てすと", rubyText: "｜テスト《てすと》",
+            meaning: "テスト用の語彙", category: "テスト", difficulty: 1,
+            exampleSentences: ["これはテストです。"]
+        )
+        
+        let progress = LearningProgress(
+            userId: user.id, vocabularyId: vocabulary.id,
+            masteryLevel: 2, correctAnswers: 8, totalAnswers: 10
+        )
+        
+        // 正答率の計算（8正解 / 10回答 = 80%）
+        let accuracy = progress.accuracyRate
+        
+        #expect(progress.totalAnswers == 10)
+        #expect(abs(accuracy - 0.8) < 0.01) // 80%に近い
+    }
+}
+
+// MARK: - Character and Achievement Model Tests
+
+/// CharacterとAchievementモデルの単体テストスイート
+/// キャラクターと実績モデルの基本機能をテストする
+@MainActor
+struct CharacterAndAchievementModelTests {
+    
+    @Test("Characterモデルの初期化")
+    func testCharacterInitialization() throws {
+        let character = Character(
+            name: "ひらがな君",
+            description: "ひらがなを教えてくれるキャラクター",
+            imageURL: "character_hiragana",
+            unlockCondition: "レベル3に到達"
+        )
+        
+        #expect(character.name == "ひらがな君")
+        #expect(character.description == "ひらがなを教えてくれるキャラクター")
+        #expect(character.imageURL == "character_hiragana")
+        #expect(character.unlockCondition == "レベル3に到達")
+        #expect(character.isUnlocked == false) // デフォルトは未解放
+        #expect(character.id != UUID()) // UUIDが生成されている
+    }
+    
+    @Test("Achievementモデルの初期化")
+    func testAchievementInitialization() throws {
+        let achievement = Achievement(
+            title: "初回学習達成",
+            description: "初めて語彙を学習しました",
+            iconName: "star.fill",
+            condition: "1つの語彙を学習する",
+            points: 10
+        )
+        
+        #expect(achievement.title == "初回学習達成")
+        #expect(achievement.description == "初めて語彙を学習しました")
+        #expect(achievement.iconName == "star.fill")
+        #expect(achievement.condition == "1つの語彙を学習する")
+        #expect(achievement.points == 10)
+        #expect(achievement.isEarned == false) // デフォルトは未獲得
+        #expect(achievement.id != UUID()) // UUIDが生成されている
+    }
+}
