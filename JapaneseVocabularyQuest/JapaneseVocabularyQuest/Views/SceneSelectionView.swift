@@ -7,6 +7,8 @@ struct SceneSelectionView: View {
     @State private var viewState: SceneSelectionViewState?
     /// SwiftDataモデルコンテキスト（将来のデータ操作用）
     @Environment(\.modelContext) private var modelContext
+    /// ナビゲーション制御用のPath（親から渡される）
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         ZStack {
@@ -118,13 +120,13 @@ struct SceneSelectionView: View {
             if !(viewState?.schoolLifeScenes.isEmpty ?? true) {
                 LazyVStack(spacing: 12) {
                     ForEach(viewState?.schoolLifeScenes ?? [], id: \.id) { scene in
-                        NavigationLink(destination: LearningView(scene: scene)) {
-                            SceneCard(
-                                scene: scene,
-                                progress: viewState?.getProgress(for: scene) ?? 0
-                            ) {}
+                        SceneCard(
+                            scene: scene,
+                            progress: viewState?.getProgress(for: scene) ?? 0
+                        ) {
+                            print("🎯 SceneCard tapped - navigating to scene: \(scene.title)")
+                            navigationPath.append(scene)
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             } else {
@@ -139,13 +141,13 @@ struct SceneSelectionView: View {
                     
                     LazyVStack(spacing: 12) {
                         ForEach(viewState?.dailyLifeScenes ?? [], id: \.id) { scene in
-                            NavigationLink(destination: LearningView(scene: scene)) {
-                                SceneCard(
-                                    scene: scene,
-                                    progress: viewState?.getProgress(for: scene) ?? 0
-                                ) {}
+                            SceneCard(
+                                scene: scene,
+                                progress: viewState?.getProgress(for: scene) ?? 0
+                            ) {
+                                print("🎯 SceneCard tapped - navigating to scene: \(scene.title)")
+                                navigationPath.append(scene)
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
@@ -185,5 +187,11 @@ struct SceneSelectionView: View {
 }
 
 #Preview {
-    SceneSelectionView()
+    @State var navigationPath = NavigationPath()
+    return NavigationStack(path: $navigationPath) {
+        SceneSelectionView(navigationPath: $navigationPath)
+            .navigationDestination(for: LearningScene.self) { scene in
+                LearningView(scene: scene)
+            }
+    }
 }

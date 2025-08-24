@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 /// 学習画面の状態管理を行うViewStateクラス
 /// 語彙学習セッション中の進捗や回答状況、学習成果を管理する
@@ -90,7 +91,11 @@ final class LearningViewState {
     /// ユーザーの回答を処理し、正誤判定を行って進捗を更新
     /// - Parameter answer: ユーザーの回答
     func submitAnswer(_ answer: String) async {
-        guard let currentVocabulary = currentVocabulary else { return }
+        print("🔴 submitAnswer started - showAnswer: \(showAnswer)")
+        guard let currentVocabulary = currentVocabulary else { 
+            print("❌ No current vocabulary")
+            return 
+        }
         
         userAnswer = answer
         let isCorrect = checkAnswer(answer, for: currentVocabulary)
@@ -100,9 +105,14 @@ final class LearningViewState {
         }
         totalAnswersCount += 1
         
+        print("📊 Updating user progress...")
         await userStore.updateUserProgress(vocabularyId: currentVocabulary.id, isCorrect: isCorrect)
         
-        showAnswer = true
+        print("🔄 Setting showAnswer to true...")
+        withAnimation(.easeInOut(duration: 0.3)) {
+            showAnswer = true
+        }
+        print("✅ submitAnswer completed - showAnswer: \(showAnswer)")
     }
     
     /// クイズの選択肢を選択したときの処理

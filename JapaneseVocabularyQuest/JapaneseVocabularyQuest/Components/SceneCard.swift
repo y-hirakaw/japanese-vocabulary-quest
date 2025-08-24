@@ -143,7 +143,7 @@ struct SceneCard: View {
 struct SceneMiniCard: View {
     let scene: LearningScene
     let isSelected: Bool
-    let onTap: () -> Void
+    let onTap: (() -> Void)?
     
     var body: some View {
         VStack(spacing: 8) {
@@ -172,10 +172,10 @@ struct SceneMiniCard: View {
                 )
         )
         .onTapGesture {
-            onTap()
+            onTap?()
         }
         .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
+        .accessibilityAddTraits(onTap != nil ? .isButton : [])
         .accessibilityLabel(scene.title)
         .accessibilityValue(isSelected ? "選択中" : "")
     }
@@ -221,11 +221,11 @@ struct SceneMiniCard: View {
     )
     
     VStack(spacing: 20) {
-        SceneCard(scene: scene, progress: 0.7) {}
+        SceneCard(scene: scene, progress: 0.7, onTap: {})
         
         HStack(spacing: 12) {
-            SceneMiniCard(scene: scene, isSelected: true) {}
-            SceneMiniCard(scene: scene, isSelected: false) {}
+            SceneMiniCard(scene: scene, isSelected: true, onTap: {})
+            SceneMiniCard(scene: scene, isSelected: false, onTap: {})
         }
     }
     .padding()

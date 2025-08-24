@@ -114,9 +114,12 @@ struct LearningView: View {
                                 vocabulary: vocabulary,
                                 showAnswer: viewState.showAnswer
                             ) {
+                                print("🔍 VocabularyCard tapped - showAnswer: \(viewState.showAnswer)")
                                 if !viewState.showAnswer {
-                                    Task {
+                                    Task { @MainActor in
+                                        print("🔄 Starting submitAnswer task")
                                         await viewState.submitAnswer("")
+                                        print("✅ submitAnswer completed - showAnswer: \(viewState.showAnswer)")
                                     }
                                 }
                             }

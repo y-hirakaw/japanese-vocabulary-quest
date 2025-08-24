@@ -4,6 +4,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab: Int = 0
+    @State private var learningNavigationPath = NavigationPath()
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -15,9 +16,12 @@ struct ContentView: View {
                 }
                 .tag(0)
             
-            NavigationView {
-                SceneSelectionView()
+            NavigationStack(path: $learningNavigationPath) {
+                SceneSelectionView(navigationPath: $learningNavigationPath)
                     .environment(\.modelContext, modelContext)
+                    .navigationDestination(for: LearningScene.self) { scene in
+                        LearningView(scene: scene)
+                    }
             }
             .tabItem {
                 Image(systemName: "book.fill")
@@ -45,7 +49,7 @@ struct ContentView: View {
 
 struct DictionaryView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Image(systemName: "books.vertical")
                     .font(.system(size: 60))
@@ -71,7 +75,7 @@ struct DictionaryView: View {
 
 struct ProgressTrackingView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.system(size: 60))

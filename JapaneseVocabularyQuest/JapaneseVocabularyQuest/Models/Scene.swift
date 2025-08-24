@@ -59,6 +59,18 @@ final class LearningScene {
     }
 }
 
+/// LearningSceneをHashableに準拠させるための拡張
+/// NavigationPathでの使用に必要
+extension LearningScene: Hashable {
+    static func == (lhs: LearningScene, rhs: LearningScene) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
 /// 学習場面のカテゴリーを定義するenum
 /// 学校生活と日常生活の主要場面を分類する
 enum SceneCategory: String, Codable, CaseIterable {

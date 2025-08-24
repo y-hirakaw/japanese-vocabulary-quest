@@ -79,7 +79,9 @@ struct VocabularyCard: View {
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         )
         .onTapGesture {
+            print("🎯 VocabularyCard onTapGesture fired")
             onTap()
+            print("🎯 VocabularyCard onTap() called")
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(showAnswer ? [] : .isButton)

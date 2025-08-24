@@ -9,7 +9,7 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 backgroundColor
                 
